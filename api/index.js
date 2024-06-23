@@ -8,6 +8,7 @@ dotenv.config();
 
 const app = epxress();
 
+app.use(epxress.json());
 app.use('/api/auth', authRoutes);
 
 const PORT = process.env.PORT || 3001;
@@ -19,4 +20,11 @@ mongoose
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}!`);
+});
+
+app.use((err, req, res, next) => {
+    const statusCode = err.statusCode || 500;
+    const message = err.message || 'Internal Server Error';
+
+    res.status(statusCode).json({ success: false, statusCode, message });
 });
