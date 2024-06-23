@@ -4,7 +4,7 @@ import { errorHandler } from '../utils/error.js';
 
 export const signup = async (req, res, next) => {
     const { fullName, email, password } = req.body;
-    if (!fullName || !email || !password) {
+    if (!fullName || !email || !password || fullName === '' || email === '' || password === '') {
         next(errorHandler(400, 'Vui lòng nhập đầy đủ thông tin!'));
     }
 
