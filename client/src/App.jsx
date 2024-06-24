@@ -6,10 +6,15 @@ import SignIn from './pages/SignIn';
 import SignUp from './pages/SignUp';
 import PrivateRoute from './components/PrivateRoute';
 import PrivateRouteSign from './components/PrivateRouteSign.jsx';
+import Navbar from './components/Navbar.jsx';
+import { useSelector } from 'react-redux';
 
 export default function App() {
+    const { currentUser } = useSelector((state) => state.user);
+
     return (
         <BrowserRouter>
+            {currentUser && <Navbar />}
             <Routes>
                 <Route element={<PrivateRouteSign />}>
                     <Route path="/signin" element={<SignIn />} />
