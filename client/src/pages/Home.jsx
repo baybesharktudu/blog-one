@@ -1,14 +1,34 @@
 import { FaArrowRightLong } from 'react-icons/fa6';
 import Posts from '../components/Posts';
 import Users from '../components/Users';
+import { useSelector } from 'react-redux';
+import { useEffect, useState } from 'react';
 
 export default function Home() {
+    const { currentUser } = useSelector((state) => state.user);
+    const [users, getUsers] = useState([]);
+
+    useEffect(() => {
+        const fetchUsers = async () => {
+            try {
+                const res = await fetch('/api/user/getusers');
+                const data = await res.json();
+                console.log(data);
+                if (res.ok) {
+                    getUsers(data);
+                }
+            } catch (error) {
+                console.log(error.message);
+            }
+        };
+
+        fetchUsers();
+    }, []);
     return (
         <div className="ml-[200px] relative text-white/40 bg-gray-950 pt-10 pb-10">
             <div className="flex w-full justify-center">
                 <div className="w-[1200px] flex justify-between gap-4">
                     <div className="flex flex-col gap-4 w-8/12 rounded-lg">
-                        <Posts />
                         <Posts />
                     </div>
                     <div className="w-4/12 sticky h-[700px] bg-gray-900 top-4 p-4 rounded-lg flex flex-col gap-5">
@@ -19,7 +39,7 @@ export default function Home() {
                                     src="https://cdn-icons-png.flaticon.com/512/1077/1077114.png"
                                     alt=""
                                 />
-                                <h3 className="text-white/40/70 text-sm">Bay be</h3>
+                                <h3 className="text-white/40/70 text-sm">{currentUser.fullName}</h3>
                             </div>
                             <button className="hover:scale-110 transition text-xl text-white/40">
                                 <FaArrowRightLong />
@@ -29,7 +49,9 @@ export default function Home() {
                             <h1 className="text-xs text-white/40/40">Những người bạn có thể biết?</h1>
                         </div>
                         <div className="h-full x overflow-y-scroll">
-                            <Users />
+                            {users.map((user) => (
+                                <Users key={user._id} fullName={user.fullName} />
+                            ))}
                         </div>
                     </div>
                 </div>

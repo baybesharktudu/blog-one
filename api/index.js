@@ -10,6 +10,8 @@ dotenv.config();
 const app = epxress();
 
 app.use(epxress.json());
+app.use(cookieParser());
+
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
 
