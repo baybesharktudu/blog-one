@@ -1,10 +1,14 @@
 import { useEffect, useState } from 'react';
 import OAuthGoogle from '../components/OAuthGoogle';
 import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { signInStart, signInSuccess, signInFailure } from '../redux/user/userSlice';
 
 export default function SignIn() {
+    const { loading, error } = useSelector((state) => state.user);
     const [formData, setFormData] = useState({});
-    const [errorMessage, setErrorMessage] = useState(null);
+
+    const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const handleChange = (e) => {
@@ -12,21 +16,22 @@ export default function SignIn() {
     };
 
     useEffect(() => {
-        if (errorMessage) {
+        if (error) {
             const timeout = setTimeout(() => {
-                setErrorMessage(null);
+                dispatch(signInStart());
             }, 2000);
 
             return () => clearTimeout(timeout);
         }
-    }, [errorMessage]);
+    }, [error]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!formData.email || !formData.password) {
-            return setErrorMessage('Vui lòng nhập đầy đủ thông tin!');
+            return dispatch(signInFailure('Vui lòng nhập đầy đủ thông tin!'));
         }
 
+        dispatch(signInStart());
         try {
             const res = await fetch('/api/auth/signin', {
                 method: 'POST',
@@ -35,13 +40,13 @@ export default function SignIn() {
             });
 
             const data = await res.json();
-
             if (data.success === false) {
-                return setErrorMessage(data.message);
+                return dispatch(signInFailure(data.message));
             }
+            dispatch(signInSuccess(data));
             navigate('/');
         } catch (error) {
-            setErrorMessage(error);
+            dispatch(signInFailure(error));
         }
     };
 
@@ -70,7 +75,8 @@ export default function SignIn() {
                         <button type="submit" className="bg-gray-950 p-2 rounded-lg duration-200 hover:bg-gray-950/60">
                             Đăng nhập
                         </button>
-                        {errorMessage && <span className="text-red-500">{errorMessage}</span>}
+                        {loading && <span className="text-green-500">Vui lòng đợi đang đăng nhập!</span>}
+                        {error && <span className="text-red-500">{error}</span>}
                     </form>
                     <span className="text-sm flex gap-2">
                         Bạn chưa có tài khoản ?
